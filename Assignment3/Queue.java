@@ -1,7 +1,7 @@
 package Assignment3;
 import java.util.Objects;
 
-public class Queue<T extends Comparable<T>> {
+public class Queue<T extends Comparable<? super T>> {
     private static class Node<E> {
         E data;
         Node<E> next;
@@ -20,7 +20,7 @@ public class Queue<T extends Comparable<T>> {
         this.size = 0;
     }
     
-    public void enqueue(T data) {
+    public void enqueue(T data) { //adds to the rear
         Node<T> node = new Node<>(data);
         if (tail != null) tail.next = node;
         tail = node;
@@ -28,7 +28,7 @@ public class Queue<T extends Comparable<T>> {
         size++;
     }
 
-    public T dequeue() {
+    public T dequeue() { //removes from the front
         if (head == null) throw new IllegalStateException("Queue is empty");
         T data = head.data;
         head = head.next;
@@ -37,49 +37,49 @@ public class Queue<T extends Comparable<T>> {
         return data;
     }
 
-    public boolean isEmpty() {
+    public boolean isEmpty() { //checks if the queue is empty
         return size == 0;
     }
 
-    public int size() {
+    public int size() { //returns # of elements
         return size;
     }
 
-    public T peek() {
+    public T peek() { //returns front element without removing
         return head == null ? null : head.data;
     }
 
-    public void clear() {
+    public void clear() {//clears queue
         head = tail = null;
         size = 0;
     }
 
-    public T poll() {
+    public T poll() {//returns front element or null if empty
         if (head == null) return null;
         return head.data;
     }
 
-    public boolean offer(T data) {
+    public boolean offer(T data) {//enqueue wrapper returning true
         enqueue (data); 
         return true;
     }
 
-    public void moveToEnd() {
-        if (peek() == null || poll() == null) return; // empty or single element
+    public void moveToEnd() {//moves front element to the end
+        if (head == null || head.next == null) return; // empty or single element
         Node<T> oldHead = head;
-        
-        offer(oldHead.data);
         head = head.next;
+        oldHead.next = null;
+        tail.next = oldHead;
+        tail = oldHead;
     }
 
-    private int search(Node<T> current, T key, int index) { //private method
+    private int search(Node<T> current, T key, int index) { //private search method
         if (current == null) return -1;
         int lastIndex = search(current.next, key, index + 1);
         if (lastIndex != -1) return lastIndex;
-        if (current.data.equals(key)) return index;
         return Objects.equals(current.data, key) ? index : -1;
     }
-    public int contains (T target) {
+    public int contains (T target) { //wrapper for search method
         return search(head, target, 0);
     }
 
@@ -87,6 +87,7 @@ public class Queue<T extends Comparable<T>> {
         if (head == null || head.next == null) return head;
         Node<T> off = new Node<>(null);
         Node<T> current = head;
+        //traverses list and inserts each node into the sorted part
         while (current != null) {
             Node<T> next = current.next;
             Node<T> prev = off;
@@ -98,10 +99,14 @@ public class Queue<T extends Comparable<T>> {
             current = next;
         }
         head = off.next;
+        tail = head;
+        while (tail != null && tail.next != null) {
+            tail = tail.next;
+        }
         return head;
     }
 
-    public String toString() {
+    public String toString() { //queue print method
         StringBuilder sb = new StringBuilder();
         Node<T> current = head;
         while (current != null) {
