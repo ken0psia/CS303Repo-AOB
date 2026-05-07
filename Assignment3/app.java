@@ -1,9 +1,4 @@
 package Assignment3;
-/*TODO: enqueue to the rear and dequeue from the front
- TODO: 
-
-*/
-
     
 public class app {
     public static void main(String[] args) {
